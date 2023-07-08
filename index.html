@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Space Invader</title>
+        <script src="game/class.js"></script>
+        <script src="game/game.js"></script>
+        <style>
+            body {
+                padding: 0px;
+                margin: 0px;
+                align-items: center;
+                overflow: hidden;
+                background-color: black;
+            }
+
+            @font-face {
+                font-family: "game-font";
+                src: url(public/game_font.ttf);
+            }
+
+            #title {
+                background-color: brown;
+                color: antiquewhite;
+                width: 100%;
+                padding: 10px;
+                text-align: center;
+                font-size: 40px;
+                font-family: "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+            }
+
+            #game {
+                display: flex;
+                justify-content: center;
+            }
+
+            #title span {
+                font-size: 16px;
+                color: black;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="game">
+            <canvas id="game-arena"></canvas>
+        </div>
+        <script src="index.js"></script>
+    </body>
+</html>
