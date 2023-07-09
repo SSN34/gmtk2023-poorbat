@@ -204,7 +204,7 @@ class Bat extends CtxImage {
     }
 
     update() {
-        this.position.y += this.speedY * (Math.random() > 0.5 ? 1 : -1);
+        this.position.y += this.speedY * [-1, 0, 1][Math.floor(Math.random() * 3)];
     }
 }
 
