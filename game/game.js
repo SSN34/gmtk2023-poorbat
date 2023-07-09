@@ -1,9 +1,10 @@
 const Game = {
     currentScene: "",
     ctx: undefined,
-    ship: [],
-    aliens: [],
-    life: 1,
+    gap: 300,
+    speed: 2,
+    score: 0,
+    intervalId: undefined,
     images: {},
     scenes: {},
     audios: {},
@@ -46,6 +47,7 @@ Game.load = function () {
         "images/3.png",
         "images/4.png",
         "images/l1.png",
+        "images/moon.png",
     ].forEach((src, i) => {
         let image = new Image();
         image.src = src;
@@ -53,7 +55,7 @@ Game.load = function () {
         Game.images[src.split("/")[1].split(".")[0]] = image;
     });
 
-    [].forEach((src, i) => {
+    ["audio/gm.mp3", "audio/eat.wav", "audio/dead.wav"].forEach((src, i) => {
         let audio = new Audio();
         audio.src = src;
 
@@ -71,29 +73,115 @@ Game.createLevels = function () {
             case "Enter":
                 document.body.style.cursor = "none";
                 Game.scenes[Game.currentScene].clear();
-                if (Game.currentScene == "play") {
-                    break;
-                }
                 Game.currentScene = "play";
-
+                Game.audios["gm"].loop = true;
+                Game.audios["gm"].volume = 0.5;
+                Game.audios["gm"].play();
+                Game.intervalId = setInterval(() => {
+                    Game.gap -= 5;
+                    Game.scenes[Game.currentScene].addObject(
+                        "pipetop",
+                        new Pipe(
+                            Game.images["pipetop"],
+                            { x: WIDTH + 50, y: -650 },
+                            false,
+                            1,
+                            1,
+                            [1, 1],
+                            Game.speed,
+                            false
+                        )
+                    );
+                    Game.scenes[Game.currentScene].addObject(
+                        "pipebottom",
+                        new Pipe(
+                            Game.images["pipebottom"],
+                            { x: WIDTH + 50, y: HEIGHT - 650 + Game.gap },
+                            false,
+                            1,
+                            1,
+                            [1, 1],
+                            Game.speed,
+                            false
+                        )
+                    );
+                }, 4000);
                 break;
             default:
                 break;
         }
     });
 
-    startScene.addObject("background", new Rect({ x: 0, y: 0 }, WIDTH, HEIGHT, "lightblue"));
+    startScene.addObject(
+        "background",
+        new CtxImage(Game.images["1"], { x: 0, y: 0 }, false, 1, 1, [
+            HEIGHT / Game.images["1"].height,
+            HEIGHT / Game.images["1"].height,
+        ])
+    );
+
+    startScene.addObject(
+        "s1",
+        new CtxImage(Game.images["2"], { x: 0, y: 0 }, false, 1, 1, [
+            HEIGHT / Game.images["2"].height,
+            HEIGHT / Game.images["2"].height,
+        ])
+    );
+
+    startScene.addObject(
+        "s2",
+        new CtxImage(Game.images["3"], { x: 0, y: -250 }, false, 1, 1, [
+            HEIGHT / Game.images["3"].height,
+            HEIGHT / Game.images["3"].height,
+        ])
+    );
+
+    startScene.addObject(
+        "s3",
+        new CtxImage(Game.images["4"], { x: 0, y: 0 }, false, 1, 1, [
+            HEIGHT / Game.images["4"].height,
+            HEIGHT / Game.images["4"].height,
+        ])
+    );
+
+    startScene.addObject(
+        "land",
+        new CtxImage(Game.images["l1"], { x: 0, y: 0 }, false, 1, 1, [
+            HEIGHT / Game.images["l1"].height,
+            HEIGHT / Game.images["l1"].height,
+        ])
+    );
+
+    startScene.addObject(
+        "baticon",
+        new CtxImage(Game.images["moon"], { x: 50, y: 20 }, true, 1, 1, [1, 1], false, false)
+    );
 
     startScene.addObject(
         "message",
-        new Message("Press ENTER to play", { x: WIDTH / 2, y: HEIGHT / 2 + 50 }, "15px game-font", "white")
+        new Message("Poor Bat", { x: WIDTH / 2, y: HEIGHT / 2 + 100 }, "72px game-font", "black")
     );
 
     startScene.addObject(
         "message",
         new Message(
-            "Use ← and → to move, SPACEBAR to fire",
-            { x: WIDTH / 2, y: HEIGHT / 2 + 110 },
+            "Save the poor bat from the pipes",
+            { x: WIDTH / 2, y: HEIGHT / 2 + 120 },
+            "15px game-font",
+            "black"
+        )
+    );
+
+    startScene.addObject(
+        "message",
+        new Message("ENTER to Play", { x: WIDTH / 2, y: HEIGHT / 2 + 200 }, "15px game-font", "white")
+    );
+
+    startScene.addObject(
+        "message",
+        new Message(
+            "SPACEBAR to change pipe movement",
+            { x: WIDTH / 2, y: HEIGHT / 2 + 230 },
             "15px game-font",
             "white"
         )
@@ -101,15 +189,23 @@ Game.createLevels = function () {
 
     startScene.addObject(
         "message",
-        new Message("Press ESCAPE to pause", { x: WIDTH / 2, y: HEIGHT / 2 + 80 }, "15px game-font", "white")
+        new Message("ESCAPE to Pause", { x: WIDTH / 2, y: HEIGHT / 2 + 260 }, "15px game-font", "white")
     );
 
     startScene.addObject(
         "message",
-        new Message("Click anywhere for audio", { x: WIDTH / 2, y: HEIGHT / 2 + 140 }, "10px game-font", "white")
+        new Message("F5 to Restart", { x: WIDTH / 2, y: HEIGHT / 2 + 290 }, "15px game-font", "white")
     );
 
-    startScene.update = function () {};
+    startScene.update = function () {
+        this.objects["background"].forEach((s) => (s.position.x -= 0.1));
+        this.objects["s2"].forEach((s) => (s.position.x -= 0.25));
+        this.objects["s2"].forEach((s) => s.update());
+        this.objects["s3"].forEach((s) => (s.position.x -= 0.5));
+        this.objects["s3"].forEach((s) => s.update());
+        this.objects["land"].forEach((s) => (s.position.x -= 0.75));
+        this.objects["land"].forEach((s) => s.update());
+    };
     Game.scenes["start"] = startScene;
 
     // play scene
@@ -175,23 +271,36 @@ Game.createLevels = function () {
 
     playScene.addObject(
         "pipetop",
-        new Pipe(Game.images["pipetop"], { x: WIDTH / 2, y: -350 }, false, 1, 1, [1, 1], false)
+        new Pipe(Game.images["pipetop"], { x: WIDTH, y: -650 }, false, 1, 1, [1, 1], Game.speed, false)
     );
 
     playScene.addObject(
         "pipebottom",
-        new Pipe(Game.images["pipebottom"], { x: WIDTH / 2, y: HEIGHT - 250 }, false, 1, 1, [1, 1], false)
+        new Pipe(
+            Game.images["pipebottom"],
+            { x: WIDTH, y: HEIGHT - 650 + Game.gap },
+            false,
+            1,
+            1,
+            [1, 1],
+            Game.speed,
+            false
+        )
     );
 
     playScene.addObject(
         "bat",
-        new Bat(Game.images["bat"], { x: WIDTH * 0.2, y: HEIGHT / 2 }, false, 4, 10, [2, 2], false)
+        new Bat(Game.images["bat"], { x: WIDTH * 0.2, y: HEIGHT / 2 - 64 }, false, 4, 10, [2, 2], false)
     );
 
+    playScene.addObject("score", new Message(Game.score, { x: WIDTH / 2, y: 100 }, "30px game-font", "white"));
+
     playScene.update = function () {
+        this.objects["pipetop"][0].speedY = 2;
+        this.objects["pipebottom"][0].speedY = 2;
         this.objects["pipetop"].forEach((pipe) => pipe.update());
         this.objects["pipebottom"].forEach((pipe) => pipe.update());
-        this.objects["background"].forEach((s) => (s.position.x -= 0.05));
+        this.objects["background"].forEach((s) => (s.position.x -= 0.1));
         this.objects["s2"].forEach((s) => (s.position.x -= 0.5));
         this.objects["s2"].forEach((s) => s.update());
         this.objects["s3"].forEach((s) => (s.position.x -= 1));
@@ -199,6 +308,32 @@ Game.createLevels = function () {
         this.objects["land"].forEach((s) => (s.position.x -= 1.5));
         this.objects["land"].forEach((s) => s.update());
         this.objects["bat"].forEach((s) => s.update());
+
+        if (
+            this.objects["pipetop"][0].position.x + this.objects["pipetop"][0].dim.width <
+                this.objects["bat"][0].position.x + 20 &&
+            !this.objects["pipetop"][0].cleared
+        ) {
+            Game.score++;
+            this.objects["score"][0].text = Game.score;
+            this.objects["pipetop"][0].cleared = true;
+            Game.audios["eat"].play();
+        }
+
+        if (this.objects.pipetop[0].position.x + this.objects.pipetop[0].dim.width < 0) {
+            this.objects["pipetop"].shift();
+            this.objects["pipebottom"].shift();
+        }
+
+        if (
+            hasCollided(this.objects["pipetop"][0], this.objects["bat"][0]) ||
+            hasCollided(this.objects["pipebottom"][0], this.objects["bat"][0])
+        ) {
+            Game.scenes[Game.currentScene].clear();
+            clearInterval(Game.intervalId);
+            Game.audios["dead"].play();
+            Game.currentScene = "gameover";
+        }
     };
 
     Game.scenes["play"] = playScene;
@@ -208,28 +343,23 @@ Game.drawLevel = function () {
     this.scenes[this.currentScene].init();
     this.scenes[this.currentScene].draw();
     this.scenes[this.currentScene].update();
-
+    if (Game.currentScene == "gameover") {
+        Game.audios["gm"].pause();
+        new Message("GAME OVER", { x: WIDTH / 2, y: HEIGHT / 2 }, "60px game-font", "maroon").draw();
+        new Message("F5 to restart", { x: WIDTH / 2, y: HEIGHT / 2 + 72 }, "16px game-font", "white").draw();
+        return true;
+    }
     return false;
 };
 
 function hasCollided(obj1, obj2) {
-    let dims1 = {
-        centerX: obj1.position.x + (obj1.dim.width * obj1.scale) / 2,
-        centerY: obj1.position.y + (obj1.dim.height * obj1.scale) / 2,
-        radius: obj1.dim.width / 2,
-    };
-    let dims2 = {
-        centerX: obj2.position.x + (obj2.dim.width * obj2.scale) / 2,
-        centerY: obj2.position.y + (obj2.dim.height * obj2.scale) / 2,
-        radius: obj2.dim.width / 2,
-    };
-
-    if (getDistance(dims1.centerX, dims1.centerY, dims2.centerX, dims2.centerY) < dims1.radius + dims2.radius) {
+    if (
+        obj1.position.x < obj2.position.x + 10 + obj2.dim.width &&
+        obj1.position.x + obj1.dim.width > obj2.position.x - 10 &&
+        obj1.position.y < obj2.position.y + 10 + obj2.dim.height &&
+        obj1.position.y + obj1.dim.height > obj2.position.y + 10
+    ) {
         return true;
     }
     return false;
-}
-
-function getDistance(x1, y1, x2, y2) {
-    return Math.pow(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2), 1 / 2);
 }

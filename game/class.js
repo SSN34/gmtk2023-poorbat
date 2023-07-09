@@ -39,8 +39,6 @@ class Scene {
             });
         });
 
-        console.log("Scene init");
-
         this.eventListeners.forEach((eventListener) => {
             window.addEventListener(eventListener.event, eventListener.callback);
         });
@@ -60,13 +58,17 @@ class Scene {
     draw() {
         Object.values(this.objects).forEach((eachObj) => {
             eachObj.forEach((element) => {
-                element.draw();
+                if (element.draw) {
+                    element.draw();
+                }
             });
         });
 
         Object.values(this.images).forEach((eachImageGrp) => {
             eachImageGrp.forEach((image) => {
-                image.draw();
+                if (image.draw) {
+                    image.draw();
+                }
             });
         });
     }
@@ -181,44 +183,28 @@ class CtxImage {
 }
 
 class Pipe extends CtxImage {
-    constructor(image, position, shakeImage, spriteFrames, spriteFPS, scale, drawSecond) {
+    constructor(image, position, shakeImage, spriteFrames, spriteFPS, scale, speed, drawSecond) {
         super(image, position, shakeImage, spriteFrames, spriteFPS, scale, false, drawSecond);
-        this.speedX = 1;
-        this.speedY = 2;
+        this.speedX = speed;
+        this.speedY = 0;
         this.direction = true;
+        this.cleared = false;
     }
 
     update() {
         this.position.x -= this.speedX;
-        this.position.y += this.speedY * this.direction ? -1 : 1;
+        this.position.y += this.speedY * (this.direction ? -1 : 1);
     }
 }
 
 class Bat extends CtxImage {
     constructor(image, position, shakeImage, spriteFrames, spriteFPS, scale, drawSecond) {
         super(image, position, shakeImage, spriteFrames, spriteFPS, scale, false, drawSecond);
-        this.speedY = 5;
+        this.speedY = 3;
     }
 
     update() {
         this.position.y += this.speedY * (Math.random() > 0.5 ? 1 : -1);
-    }
-}
-
-class Rect {
-    constructor(position, width, height, color) {
-        this.position = position;
-        this.color = color;
-        this.scale = 1;
-        this.dim = {
-            width: width,
-            height: height,
-        };
-    }
-
-    draw() {
-        Game.ctx.fillStyle = this.color;
-        Game.ctx.fillRect(this.position.x, this.position.y, this.dim.width, this.dim.height);
     }
 }
 
