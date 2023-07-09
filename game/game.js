@@ -78,12 +78,12 @@ Game.createLevels = function () {
                 Game.audios["gm"].volume = 0.5;
                 Game.audios["gm"].play();
                 Game.intervalId = setInterval(() => {
-                    Game.gap -= 5;
+                    Game.gap = Math.max(150, Game.gap - 5);
                     Game.scenes[Game.currentScene].addObject(
                         "pipetop",
                         new Pipe(
                             Game.images["pipetop"],
-                            { x: WIDTH + 50, y: -650 },
+                            { x: WIDTH + 100, y: -650 },
                             false,
                             1,
                             1,
@@ -96,7 +96,7 @@ Game.createLevels = function () {
                         "pipebottom",
                         new Pipe(
                             Game.images["pipebottom"],
-                            { x: WIDTH + 50, y: HEIGHT - 650 + Game.gap },
+                            { x: WIDTH + 100, y: HEIGHT - 650 + Game.gap },
                             false,
                             1,
                             1,
@@ -180,9 +180,9 @@ Game.createLevels = function () {
     startScene.addObject(
         "message",
         new Message(
-            "SPACEBAR to change pipe movement",
+            "SPACEBAR to toggle pipe movement direction",
             { x: WIDTH / 2, y: HEIGHT / 2 + 230 },
-            "15px game-font",
+            "14px game-font",
             "white"
         )
     );
@@ -294,6 +294,16 @@ Game.createLevels = function () {
     );
 
     playScene.addObject("score", new Message(Game.score, { x: WIDTH / 2, y: 100 }, "30px game-font", "white"));
+
+    playScene.addObject(
+        "message",
+        new Message(
+            "SPACEBAR to toggle pipe movement direction",
+            { x: WIDTH / 2, y: HEIGHT - 40 },
+            "14px game-font",
+            "white"
+        )
+    );
 
     playScene.update = function () {
         this.objects["pipetop"][0].speedY = 2;
