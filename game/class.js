@@ -30,7 +30,7 @@ class Scene {
         console.log("Update not implemented");
     }
     init() {
-        if(this.initialized){
+        if (this.initialized) {
             return;
         }
         Object.values(this.images).forEach((eachImageGrp) => {
@@ -73,7 +73,16 @@ class Scene {
 }
 
 class CtxImage {
-    constructor(image, position, shakeImage, spriteFrames = 1, spriteFPS = 10, scale = [1, 1], repeat = false) {
+    constructor(
+        image,
+        position,
+        shakeImage,
+        spriteFrames = 1,
+        spriteFPS = 10,
+        scale = [1, 1],
+        repeat = false,
+        drawSecond = true
+    ) {
         this.image = image;
         this.position = position;
         this.scale = scale;
@@ -83,14 +92,15 @@ class CtxImage {
         this.currentSprite = 0;
         this.intervalIDs = [];
         this.spriteFPS = spriteFPS;
+        this.drawSecond = drawSecond;
         this.repeat = repeat;
         this.dim = {
             width: this.frameWidth,
             height: image.height,
         };
         this.displace = {
-            x: 1,
-            y: 1,
+            x: 0,
+            y: 0,
         };
         this.coin = [-1, 1];
         this.init();
@@ -132,6 +142,26 @@ class CtxImage {
             imgattrs.dw,
             imgattrs.dh
         );
+
+        if (this.drawSecond) {
+            Game.ctx.drawImage(
+                this.image,
+                imgattrs.sx,
+                imgattrs.sy,
+                imgattrs.sw,
+                imgattrs.sh,
+                imgattrs.dx + this.image.width * this.scale[0],
+                imgattrs.dy,
+                imgattrs.dw,
+                imgattrs.dh
+            );
+        }
+    }
+
+    update() {
+        if (-this.position.x >= this.image.width * this.scale[0]) {
+            this.position.x = 0;
+        }
     }
 
     updateSprite() {
@@ -151,9 +181,27 @@ class CtxImage {
 }
 
 class Pipe extends CtxImage {
-    constructor(image, position, shakeImage, spriteFrames, spriteFPS, scale) {
-        super(image, position, shakeImage, spriteFrames, spriteFPS, scale);
-        this.speedX = 5;
+    constructor(image, position, shakeImage, spriteFrames, spriteFPS, scale, drawSecond) {
+        super(image, position, shakeImage, spriteFrames, spriteFPS, scale, false, drawSecond);
+        this.speedX = 1;
+        this.speedY = 2;
+        this.direction = true;
+    }
+
+    update() {
+        this.position.x -= this.speedX;
+        this.position.y += this.speedY * this.direction ? -1 : 1;
+    }
+}
+
+class Bat extends CtxImage {
+    constructor(image, position, shakeImage, spriteFrames, spriteFPS, scale, drawSecond) {
+        super(image, position, shakeImage, spriteFrames, spriteFPS, scale, false, drawSecond);
+        this.speedY = 5;
+    }
+
+    update() {
+        this.position.y += this.speedY * (Math.random() > 0.5 ? 1 : -1);
     }
 }
 

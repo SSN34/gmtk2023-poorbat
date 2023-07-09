@@ -37,7 +37,16 @@ Game.init = function (context) {
 };
 
 Game.load = function () {
-    ["images/pipe.png", "images/pipeend.png"].forEach((src, i) => {
+    [
+        "images/pipetop.png",
+        "images/pipebottom.png",
+        "images/bat.png",
+        "images/1.png",
+        "images/2.png",
+        "images/3.png",
+        "images/4.png",
+        "images/l1.png",
+    ].forEach((src, i) => {
         let image = new Image();
         image.src = src;
 
@@ -113,21 +122,84 @@ Game.createLevels = function () {
                 Game.scenes[Game.currentScene].clear();
                 Game.currentScene = "start";
                 break;
+            case " ":
+                Game.scenes["play"].objects["pipetop"][0].direction =
+                    !Game.scenes["play"].objects["pipetop"][0].direction;
+                Game.scenes["play"].objects["pipebottom"][0].direction =
+                    !Game.scenes["play"].objects["pipebottom"][0].direction;
+                break;
             default:
                 break;
         }
     });
 
-    playScene.addObject("background", new Rect({ x: 0, y: 0 }, WIDTH, HEIGHT, "lightblue"));
-
-    playScene.addObject("pipe", new Pipe(Game.images["pipe"], { x: WIDTH / 2, y: 0 }, false, 1, 1, [2, 15]));
-
     playScene.addObject(
-        "pipeend",
-        new Pipe(Game.images["pipeend"], { x: WIDTH / 2 - 3, y: HEIGHT / 2 }, false, 1, 1, [2.2, 2])
+        "background",
+        new CtxImage(Game.images["1"], { x: 0, y: 0 }, false, 1, 1, [
+            HEIGHT / Game.images["1"].height,
+            HEIGHT / Game.images["1"].height,
+        ])
     );
 
-    playScene.update = function () {};
+    playScene.addObject(
+        "s1",
+        new CtxImage(Game.images["2"], { x: 0, y: 0 }, false, 1, 1, [
+            HEIGHT / Game.images["2"].height,
+            HEIGHT / Game.images["2"].height,
+        ])
+    );
+
+    playScene.addObject(
+        "s2",
+        new CtxImage(Game.images["3"], { x: 0, y: -250 }, false, 1, 1, [
+            HEIGHT / Game.images["3"].height,
+            HEIGHT / Game.images["3"].height,
+        ])
+    );
+
+    playScene.addObject(
+        "s3",
+        new CtxImage(Game.images["4"], { x: 0, y: 0 }, false, 1, 1, [
+            HEIGHT / Game.images["4"].height,
+            HEIGHT / Game.images["4"].height,
+        ])
+    );
+
+    playScene.addObject(
+        "land",
+        new CtxImage(Game.images["l1"], { x: 0, y: 0 }, false, 1, 1, [
+            HEIGHT / Game.images["l1"].height,
+            HEIGHT / Game.images["l1"].height,
+        ])
+    );
+
+    playScene.addObject(
+        "pipetop",
+        new Pipe(Game.images["pipetop"], { x: WIDTH / 2, y: -350 }, false, 1, 1, [1, 1], false)
+    );
+
+    playScene.addObject(
+        "pipebottom",
+        new Pipe(Game.images["pipebottom"], { x: WIDTH / 2, y: HEIGHT - 250 }, false, 1, 1, [1, 1], false)
+    );
+
+    playScene.addObject(
+        "bat",
+        new Bat(Game.images["bat"], { x: WIDTH * 0.2, y: HEIGHT / 2 }, false, 4, 10, [2, 2], false)
+    );
+
+    playScene.update = function () {
+        this.objects["pipetop"].forEach((pipe) => pipe.update());
+        this.objects["pipebottom"].forEach((pipe) => pipe.update());
+        this.objects["background"].forEach((s) => (s.position.x -= 0.05));
+        this.objects["s2"].forEach((s) => (s.position.x -= 0.5));
+        this.objects["s2"].forEach((s) => s.update());
+        this.objects["s3"].forEach((s) => (s.position.x -= 1));
+        this.objects["s3"].forEach((s) => s.update());
+        this.objects["land"].forEach((s) => (s.position.x -= 1.5));
+        this.objects["land"].forEach((s) => s.update());
+        this.objects["bat"].forEach((s) => s.update());
+    };
 
     Game.scenes["play"] = playScene;
 };
