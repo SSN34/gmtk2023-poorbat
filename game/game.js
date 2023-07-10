@@ -83,7 +83,7 @@ Game.createLevels = function () {
                         "pipetop",
                         new Pipe(
                             Game.images["pipetop"],
-                            { x: WIDTH + 100, y: -650 },
+                            { x: WIDTH + 100, y: -750 },
                             false,
                             1,
                             1,
@@ -96,7 +96,7 @@ Game.createLevels = function () {
                         "pipebottom",
                         new Pipe(
                             Game.images["pipebottom"],
-                            { x: WIDTH + 100, y: HEIGHT - 650 + Game.gap },
+                            { x: WIDTH + 100, y: Game.images["pipetop"].height - 750 + Game.gap },
                             false,
                             1,
                             1,
@@ -154,7 +154,7 @@ Game.createLevels = function () {
 
     startScene.addObject(
         "baticon",
-        new CtxImage(Game.images["moon"], { x: 50, y: 20 }, true, 1, 1, [1, 1], false, false)
+        new CtxImage(Game.images["moon"], { x: 50, y: 20 }, true, 1, 1, [window.innerWidth * 0.33 /WIDTH, 0.33 * window.innerWidth/WIDTH], false, false)
     );
 
     startScene.addObject(
@@ -271,14 +271,14 @@ Game.createLevels = function () {
 
     playScene.addObject(
         "pipetop",
-        new Pipe(Game.images["pipetop"], { x: WIDTH, y: -650 }, false, 1, 1, [1, 1], Game.speed, false)
+        new Pipe(Game.images["pipetop"], { x: WIDTH, y: -750 }, false, 1, 1, [1, 1], Game.speed, false)
     );
 
     playScene.addObject(
         "pipebottom",
         new Pipe(
             Game.images["pipebottom"],
-            { x: WIDTH, y: HEIGHT - 650 + Game.gap },
+            { x: WIDTH, y: Game.images["pipetop"].height - 750 + Game.gap },
             false,
             1,
             1,

@@ -1,5 +1,5 @@
 //consts
-const WIDTH = innerWidth * 0.33;
+const WIDTH = 650;
 const HEIGHT = innerHeight;
 
 let canvas = document.getElementById("game-arena");
