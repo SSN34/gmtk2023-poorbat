@@ -2,6 +2,8 @@
 const WIDTH = 650;
 const HEIGHT = innerHeight;
 
+const GameRatio = (innerWidth * 0.33) / WIDTH;
+
 let canvas = document.getElementById("game-arena");
 canvas.height = HEIGHT;
 canvas.width = WIDTH;
